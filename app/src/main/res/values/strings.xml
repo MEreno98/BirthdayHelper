@@ -2,4 +2,5 @@
     <string name="app_name">Birthday Helper</string>
     <string name="s_aviso">Sin Aviso</string>
     <string name="layout_text">Texto</string>
+    <string name="sin_permisos_contacots">Birthday Helper no tiene permisos para obtener los contactos.</string>
 </resources>
