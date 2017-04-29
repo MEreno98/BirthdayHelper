@@ -72,8 +72,8 @@ public class ItemAdapter extends BaseAdapter {
 
         //Cumpleaños
         tvItem = (TextView) rowView.findViewById(R.id.tv_cumple);
-        if(item.getFechaNacimiento() != "" ){
-        tvItem.setText(item.getFechaNacimiento());
+        if(item.getFechaNacimiento() != null ){
+            tvItem.setText(item.getFechaNacimiento());
         }else{
             tvItem.setVisibility(View.GONE);
         }
