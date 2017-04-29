@@ -122,7 +122,9 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     //Obtener el cumpleaños
-                    Cursor birthdayCursor = getContentResolver().query(ContactsContract.Data.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Event.START_DATE}, ContactsContract.Data.CONTACT_ID + "= ?", new String[]{mCursor.getString(mCursor.getColumnIndex(ContactsContract.Contacts._ID))}, null);
+                    Cursor birthdayCursor = getContentResolver().query(ContactsContract.Data.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Event.START_DATE}, ContactsContract.Data.CONTACT_ID + "= ? AND " + ContactsContract.Data.MIMETYPE + "= ? AND " +
+                            ContactsContract.CommonDataKinds.Event.TYPE + "=" +
+                            ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY, new String[]{mCursor.getString(mCursor.getColumnIndex(ContactsContract.Contacts._ID)), ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE}, null);
 
                     if (birthdayCursor.getCount() > 0) {
 
