@@ -6,12 +6,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -35,11 +37,15 @@ public class MainActivity extends AppCompatActivity {
         db = openOrCreateDatabase("BirthdayHelper", Context.MODE_PRIVATE, null);
         //db.execSQL("CREATE TABLE IF NOT EXISTS Birthdays(ID integer, TipoNotif char(1), Mensaje VARCHAR(160), Telefono VARCHAR(15), FechaNacimiento VARCHAR(15), Nombre VARCHAR(128));");
         db.execSQL("CREATE TABLE IF NOT EXISTS Birthdays(ID integer, TipoNotif char(1), Mensaje VARCHAR(160))");
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+        listView = (ListView) findViewById(R.id.list);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Birthday oBirthday = birthdayList.get(position);
+                
+            }
+        });
 
         //Comprobar permisos
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
@@ -57,6 +63,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             obtenerContactos();
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        birthdayList.clear();
+        obtenerContactos();
     }
 
     @Override
