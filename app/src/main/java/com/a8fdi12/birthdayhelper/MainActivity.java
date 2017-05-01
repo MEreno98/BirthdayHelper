@@ -1,6 +1,7 @@
 package com.a8fdi12.birthdayhelper;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Birthday> birthdayList = new ArrayList<Birthday>();
     private ListView listView;
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    //private static final int CONTACT_VIEW = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +38,17 @@ public class MainActivity extends AppCompatActivity {
         //Crear base de datos
         db = openOrCreateDatabase("BirthdayHelper", Context.MODE_PRIVATE, null);
         //db.execSQL("CREATE TABLE IF NOT EXISTS Birthdays(ID integer, TipoNotif char(1), Mensaje VARCHAR(160), Telefono VARCHAR(15), FechaNacimiento VARCHAR(15), Nombre VARCHAR(128));");
-        db.execSQL("CREATE TABLE IF NOT EXISTS Birthdays(ID integer, TipoNotif char(1), Mensaje VARCHAR(160))");
+        db.execSQL("CREATE TABLE IF NOT EXISTS Birthdays(ID integer, TipoNotif char(1), Mensaje VARCHAR(160), Telefono VARCHAR(15))");
 
         listView = (ListView) findViewById(R.id.list);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Birthday oBirthday = birthdayList.get(position);
-                
+
+                Intent intent = new Intent(parent.getContext(),ContactView.class);
+                intent.putExtra("birthday",oBirthday);
+                startActivity(intent);
             }
         });
 
