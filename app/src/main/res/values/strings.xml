@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">Birthday Helper</string>
+    <string name="editar_contacto">Editar Contacto</string>
     <string name="s_aviso">Sin Aviso</string>
     <string name="layout_text">Texto</string>
     <string name="sin_permisos_contactos">Los contactos no estan disponibles</string>
+    <string name="te_nombre">Nombre</string>
+    <string name="te_fechanac">Fecha de Nacimiento</string>
+    <string name="button_contacto">...</string>
+    <string name="ch_enviar">Enviar SMS</string>
+    <string name="hint_mensaje">Mensaje</string>
+    <string name="btn_guardar">Guardar</string>
 </resources>
