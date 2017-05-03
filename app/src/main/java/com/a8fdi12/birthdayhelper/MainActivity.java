@@ -1,26 +1,30 @@
 package com.a8fdi12.birthdayhelper;
 
+import android.Manifest;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.support.v7.app.NotificationCompat;
+import android.telephony.SmsManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
-import java.util.jar.Manifest;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Birthday> birthdayList = new ArrayList<Birthday>();
     private ListView listView;
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS = 2;
     //private static final int CONTACT_VIEW = 1;
 
     @Override
@@ -68,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             obtenerContactos();
         }
+
     }
 
     @Override
@@ -91,6 +97,60 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return;
             }
+            case MY_PERMISSIONS_REQUEST_SEND_SMS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Calendar c = Calendar.getInstance();
+
+                    int month = c.get(Calendar.MONTH) + 1;
+                    String sMonth = "";
+
+                    if (month < 10) {
+                        sMonth = "0" + month;
+                    } else {
+                        sMonth = Integer.toString(month);
+                    }
+
+                    int day = c.get(Calendar.DATE);
+                    String sDay = "";
+
+                    if (day < 10) {
+                        sDay = "0" + day;
+                    } else {
+                        sDay = Integer.toString(day);
+                    }
+
+                    String date = sMonth + "-" + sDay;
+
+                    for (int x = 0; x < birthdayList.size(); x++) {
+                        Birthday birthday = birthdayList.get(x);
+
+                        if (birthday.getFechaNacimiento() != null) {
+
+                            if (birthday.getFechaNacimiento().endsWith(date)) {
+
+                                if (birthday.getTipoNotif() == 'S') {
+
+                                    try {
+
+                                        SmsManager smsManager = SmsManager.getDefault();
+                                        smsManager.sendTextMessage(birthday.getSelectTel(), null, birthday.getMensaje(), null, null);
+                                        Toast.makeText(getApplicationContext(), "SMS enviado.", Toast.LENGTH_LONG).show();
+                                    } catch (Exception e) {
+
+                                        Toast.makeText(getApplicationContext(), "SMS no enviado, por favor, inténtalo otra vez.", Toast.LENGTH_LONG).show();
+                                        e.printStackTrace();
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                } else {
+
+                }
+                return;
+            }
 
         }
     }
@@ -102,7 +162,6 @@ public class MainActivity extends AppCompatActivity {
         if (mCursor.getCount() > 0) {
             while (mCursor.moveToNext()) {
                 Birthday oBirthday = new Birthday();
-
                 oBirthday.setId(mCursor.getInt(mCursor.getColumnIndex(ContactsContract.Contacts._ID)));
                 oBirthday.setNombre(mCursor.getString(mCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)));
 
@@ -172,5 +231,99 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.list);
         this.listView.setAdapter(new ItemAdapter(this, birthdayList));
         listView.setEmptyView(findViewById(R.id.emptyView));
+        comprobarCumple();
+    }
+
+    private void comprobarCumple() {
+
+        Calendar c = Calendar.getInstance();
+
+        int month = c.get(Calendar.MONTH) + 1;
+        String sMonth = "";
+
+        if (month < 10) {
+            sMonth = "0" + month;
+        } else {
+            sMonth = Integer.toString(month);
+        }
+
+        int day = c.get(Calendar.DATE);
+        String sDay = "";
+
+        if (day < 10) {
+            sDay = "0" + day;
+        } else {
+            sDay = Integer.toString(day);
+        }
+
+        String date = sMonth + "-" + sDay;
+
+        for (int x = 0; x < birthdayList.size(); x++) {
+            Birthday birthday = birthdayList.get(x);
+
+            if (birthday.getFechaNacimiento() != null) {
+
+                if (birthday.getFechaNacimiento().endsWith(date)) {
+
+                    if (birthday.getTipoNotif() == 'S') {
+                        //Comprobar permisos
+                        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.SEND_SMS)) {
+
+                            } else {
+                                //Solicitar permisos
+                                ActivityCompat.requestPermissions(this,
+                                        new String[]{Manifest.permission.SEND_SMS},
+                                        MY_PERMISSIONS_REQUEST_SEND_SMS);
+                            }
+
+                        } else {
+                            try {
+
+                                SmsManager smsManager = SmsManager.getDefault();
+                                smsManager.sendTextMessage(birthday.getSelectTel(), null, birthday.getMensaje(), null, null);
+                                Toast.makeText(getApplicationContext(), "SMS enviado.", Toast.LENGTH_LONG).show();
+                            } catch (Exception e) {
+
+                                Toast.makeText(getApplicationContext(), "SMS no enviado, por favor, inténtalo otra vez.", Toast.LENGTH_LONG).show();
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+
+                    int notifId = 1; //Identificador de la notificación, para futuras modificaciones.
+
+                    /* PASO 1: Crear la notificación con sus propiedades */
+
+                    NotificationCompat.Builder constructorNotif = new NotificationCompat.Builder(this);
+                    constructorNotif.setSmallIcon(R.mipmap.ic_cake);
+                    constructorNotif.setContentTitle(getString(R.string.noti_title));
+                    constructorNotif.setContentText(birthday.getNombre());
+
+                    /* PASO 2: Creamos un intent para abrir la actividad cuando se pulse la notificación*/
+                    Intent resultadoIntent = new Intent(this, MainActivity.class);
+
+                    //El objeto stackBuilder crea un back stack que nos asegura que el botón de "Atrás" del
+                    //dispositivo nos lleva desde la Actividad a la pantalla principal
+                    TaskStackBuilder pila = TaskStackBuilder.create(this);
+
+                    // El padre del stack será la actividad a crear
+                    pila.addParentStack(MainActivity.class);
+
+                    // Añade el Intent que comienza la Actividad al inicio de la pila
+                    pila.addNextIntent(resultadoIntent);
+
+                    PendingIntent resultadoPendingIntent = pila.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                    constructorNotif.setContentIntent(resultadoPendingIntent);
+
+                    /* PASO 3. Crear y enviar */
+                    NotificationManager notificador = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificador.notify(notifId, constructorNotif.build());
+
+                }
+            }
+        }
+
     }
 }

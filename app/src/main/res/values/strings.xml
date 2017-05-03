@@ -12,4 +12,7 @@
     <string name="ch_enviar">Enviar SMS</string>
     <string name="hint_mensaje">Mensaje</string>
     <string name="btn_guardar">Guardar</string>
+    <string name="success_contacto">Contacto actualizado correctamente</string>
+    <string name="error_contacto">Error al actualizar el contacto</string>
+    <string name="noti_title">Cumpleaños</string>
 </resources>
