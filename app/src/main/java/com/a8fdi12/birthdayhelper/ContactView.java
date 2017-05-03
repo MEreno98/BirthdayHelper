@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -20,6 +21,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ContactView extends AppCompatActivity {
 
@@ -57,11 +59,12 @@ public class ContactView extends AppCompatActivity {
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sp_telefonos.setAdapter(spinnerArrayAdapter);
 
-        for (int x = 0; x < oBirthday.getTelefonos().size(); x++){
+        /*for (int x = 0; x < oBirthday.getTelefonos().size(); x++){
             if (oBirthday.getTelefono(x) == oBirthday.getSelectTel()){
+                System.out.println(oBirthday.getSelectTel());
                 sp_telefonos.setSelection(x);
             }
-        }
+        }*/
 
         //Fecha de Nacimiento
         tvItem = (TextView) findViewById(R.id.tv_cumple);
@@ -121,6 +124,7 @@ public class ContactView extends AppCompatActivity {
 
     public void onGuardar(View v){
         Cursor c = db.rawQuery("Select * FROM Birthdays WHERE ID =?",new String[]{Integer.toString(oBirthday.getId())});
+        long resultado;
 
         if(c.getCount() > 0){
             ContentValues nuevoRegistro = new ContentValues();
@@ -138,7 +142,7 @@ public class ContactView extends AppCompatActivity {
             Spinner sp_telefono = (Spinner) findViewById(R.id.sp_telefonos);
             nuevoRegistro.put("Telefono",sp_telefono.getSelectedItem().toString());
 
-           db.update("Birthdays", nuevoRegistro, "ID =?",new String[]{Integer.toString(oBirthday.getId())});
+           resultado = db.update("Birthdays", nuevoRegistro, "ID =?",new String[]{Integer.toString(oBirthday.getId())});
         }else{
             ContentValues nuevoRegistro = new ContentValues();
             nuevoRegistro.put("ID",oBirthday.getId());
@@ -156,14 +160,26 @@ public class ContactView extends AppCompatActivity {
             Spinner sp_telefono = (Spinner) findViewById(R.id.sp_telefonos);
             nuevoRegistro.put("Telefono",sp_telefono.getSelectedItem().toString());
 
-            db.insert("Birthdays", null, nuevoRegistro);
+            resultado = db.insert("Birthdays", null, nuevoRegistro);
+        }
+
+        if (resultado != -1){
+            Toast.makeText(this,getString(R.string.success_contacto),Toast.LENGTH_LONG).show();
+        }else{
+            Toast.makeText(this,getString(R.string.error_contacto),Toast.LENGTH_LONG).show();
         }
 
         c.close();
     }
 
     public void onVerContacto(View v){
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("_ID:"+oBirthday.getId()));
+        Uri uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_URI, String.valueOf(oBirthday.getId()));
+        intent.setData(uri);
 
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     @Override

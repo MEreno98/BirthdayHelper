@@ -35,8 +35,8 @@ public class Birthday implements Parcelable{
         this.selectTel = selectTel;
         this.fechaNacimiento = fechaNacimiento;
         this.nombre = nombre;
-        this.photo = photo;
         this.telefonos = telefonos;
+        this.photo = photo;
     }
 
     public Birthday(Parcel in){
@@ -46,14 +46,14 @@ public class Birthday implements Parcelable{
         this.selectTel = in.readString();
         this.fechaNacimiento = in.readString();
         this.nombre = in.readString();
+        this.telefonos = in.createStringArrayList();
 
-        if (in.readString() != null){
-            this.photo = Uri.parse(in.readString());
+        String path = in.readString();
+        if (path != null){
+            this.photo = Uri.parse(path);
         }else {
             this.photo = null;
         }
-
-        this.telefonos = in.createStringArrayList();
     }
 
     public int getId() {
@@ -148,6 +148,7 @@ public class Birthday implements Parcelable{
         dest.writeString(selectTel);
         dest.writeString(fechaNacimiento);
         dest.writeString(nombre);
+        dest.writeStringList(telefonos);
 
         if (photo != null){
             dest.writeString(photo.toString());
@@ -155,6 +156,5 @@ public class Birthday implements Parcelable{
             dest.writeString(null);
         }
 
-        dest.writeStringList(telefonos);
     }
 }
