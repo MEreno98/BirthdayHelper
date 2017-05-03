@@ -57,7 +57,8 @@
         android:layout_above="@+id/sp_telefonos"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:text="@string/button_contacto" />
+        android:text="@string/button_contacto"
+        android:onClick="onVerContacto"/>
 
     <CheckBox
         android:id="@+id/cb_esms"
@@ -91,6 +92,7 @@
         android:layout_below="@+id/et_mensaje"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="41dp"
-        android:text="@string/btn_guardar" />
+        android:text="@string/btn_guardar"
+        android:onClick="onGuardar"/>
 
 </RelativeLayout>
