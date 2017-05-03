@@ -147,12 +147,13 @@ public class MainActivity extends AppCompatActivity {
 
                 }
 
-                Cursor cdb = db.rawQuery("SELECT TipoNotif, Mensaje FROM Birthdays WHERE ID = ?", new String[]{Integer.toString(oBirthday.getId())});
+                Cursor cdb = db.rawQuery("SELECT TipoNotif, Mensaje, Telefono FROM Birthdays WHERE ID = ?", new String[]{Integer.toString(oBirthday.getId())});
 
                 if (cdb.getCount() > 0) {
                     while (cdb.moveToNext()) {
                         oBirthday.setTipoNotif(cdb.getString(0).charAt(0));
                         oBirthday.setMensaje(cdb.getString(1));
+                        oBirthday.setTelefono(cdb.getString(2));
                     }
                 }
 
