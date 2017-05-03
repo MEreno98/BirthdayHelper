@@ -96,7 +96,14 @@ public class ItemAdapter extends BaseAdapter {
 
         //Aviso
         tvItem = (TextView) rowView.findViewById(R.id.tv_aviso);
-        tvItem.setText(context.getString(R.string.s_aviso));
+
+        if (item.getTipoNotif() == 'S'){
+            tvItem.setText(context.getString(R.string.s_sms));
+        }else if(item.getTipoNotif() == 'N'){
+            tvItem.setText(context.getString(R.string.s_noti));
+        }else{
+            tvItem.setText(context.getString(R.string.s_aviso));
+        }
 
         return rowView;
     }

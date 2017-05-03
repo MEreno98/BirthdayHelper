@@ -1,14 +1,20 @@
 package com.a8fdi12.birthdayhelper;
 
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.renderscript.Sampler;
 
+import java.io.Serializable;
+import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 
 /**
  * Created by 8fdi12 on 23/3/17.
  */
 
-public class Birthday {
+public class Birthday implements Parcelable{
     private int id;
     private char tipoNotif;
     private String mensaje;
@@ -31,6 +37,23 @@ public class Birthday {
         this.nombre = nombre;
         this.photo = photo;
         this.telefonos = telefonos;
+    }
+
+    public Birthday(Parcel in){
+        this.id = in.readInt();
+        this.tipoNotif = in.readString().charAt(0);
+        this.mensaje = in.readString();
+        this.selectTel = in.readString();
+        this.fechaNacimiento = in.readString();
+        this.nombre = in.readString();
+
+        if (in.readString() != null){
+            this.photo = Uri.parse(in.readString());
+        }else {
+            this.photo = null;
+        }
+
+        this.telefonos = in.createStringArrayList();
     }
 
     public int getId() {
@@ -99,5 +122,39 @@ public class Birthday {
 
     public void addTelefono(String telefono){
         telefonos.add(telefono);
+    }
+
+    public static final Parcelable.Creator<Birthday> CREATOR = new Parcelable.Creator<Birthday>(){
+        @Override
+        public Birthday createFromParcel(Parcel source) {
+            return new Birthday(source);
+        }
+
+        @Override
+        public Birthday[] newArray(int size) {
+            return new Birthday[size];
+        }
+    };
+
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(Character.toString(tipoNotif));
+        dest.writeString(mensaje);
+        dest.writeString(selectTel);
+        dest.writeString(fechaNacimiento);
+        dest.writeString(nombre);
+
+        if (photo != null){
+            dest.writeString(photo.toString());
+        }else{
+            dest.writeString(null);
+        }
+
+        dest.writeStringList(telefonos);
     }
 }
